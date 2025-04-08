@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wall -Wextra -O3 -fomit-frame-pointer CMakeFiles/fastmine.dir/fastmine.cpp.o -o fastmine  crypto/libcrypto.a crypto/libcrypto_sse4.1.a crypto/libcrypto_avx2.a crypto/libcrypto_shani.a 

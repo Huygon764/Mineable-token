@@ -5,6 +5,10 @@
   "main": "./src/miner.js",
   "scripts": {
     "start": "tsc && node ./src/miner.js",
+    "init": "tsc && node ./src/init.js",
+    "convert": "tsc && node ./src/convert.js",
+    "send": "tsc && node ./src/send-baton.js",
+    "mine-first": "tsc && node ./src/mine-first-block.js",
     "tsc": "tsc"
   },
   "repository": {
@@ -21,17 +25,23 @@
   "author": "Satoshi Nakamoto, Kasumi, update by B_S_Z",
   "license": "MIT",
   "dependencies": {
+    "@bcpros/xpi-js": "^4.0.12",
+    "@grpc/grpc-js": "^1.12.6",
+    "@grpc/proto-loader": "^0.7.13",
+    "@types/ws": "^8.5.4",
     "bitbox-sdk": "^8.11.2",
     "bitcore-lib-cash": "^9.0.0",
     "child_process": "^1.0.2",
+    "chronik-client": "^3.0.0",
     "dotenv": "^10.0.0",
-    "grpc-bchrpc-node": "^0.11.5",
-    "grpc-graphsearch-node": "^0.2.1",
+    "ecash-lib": "^2.1.0",
+    "ecashaddrjs": "^2.0.0",
     "patch-package": "^6.4.7",
     "protons": "^2.0.1",
     "slp-validate": "^1.2.3",
     "slpjs": "^0.27.11",
-    "synchronized-promise": "^0.3.1"
+    "synchronized-promise": "^0.3.1",
+    "wif": "^2.0.6"
   },
   "devDependencies": {
     "@spedn/sdk": "^3.1.1",

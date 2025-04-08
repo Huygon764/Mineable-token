@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcrypto_avx2.a CMakeFiles/crypto_avx2.dir/sha256_avx2.cpp.o
+/usr/bin/ranlib libcrypto_avx2.a

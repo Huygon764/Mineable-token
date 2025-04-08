@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcrypto_shani.a CMakeFiles/crypto_shani.dir/sha256_shani.cpp.o
+/usr/bin/ranlib libcrypto_shani.a

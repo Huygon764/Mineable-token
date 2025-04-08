@@ -1,0 +1,152 @@
+Determining if files sys/endian.h exist failed with the following output:
+Change Dir: /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_72af7/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_72af7.dir/build.make CMakeFiles/cmTC_72af7.dir/build
+gmake[1]: Entering directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_72af7.dir/HAVE_SYS_ENDIAN_H.c.o
+/usr/bin/cc   -Wall -Wextra  -std=gnu11 -o CMakeFiles/cmTC_72af7.dir/HAVE_SYS_ENDIAN_H.c.o -c /home/ken/Work/eminer/fastmine/CMakeFiles/CheckIncludeFiles/HAVE_SYS_ENDIAN_H.c
+/home/ken/Work/eminer/fastmine/CMakeFiles/CheckIncludeFiles/HAVE_SYS_ENDIAN_H.c:2:10: fatal error: sys/endian.h: No such file or directory
+    2 | #include <sys/endian.h>
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_72af7.dir/build.make:78: CMakeFiles/cmTC_72af7.dir/HAVE_SYS_ENDIAN_H.c.o] Error 1
+gmake[1]: Leaving directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_72af7/fast] Error 2
+
+
+Source:
+/* */
+#include <sys/endian.h>
+
+
+int main(void){return 0;}
+
+Performing C++ SOURCE FILE Test HAVE_SYSCTL_ARND failed with the following output:
+Change Dir: /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_570ed/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_570ed.dir/build.make CMakeFiles/cmTC_570ed.dir/build
+gmake[1]: Entering directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_570ed.dir/src.cxx.o
+/usr/bin/c++ -DHAVE_SYSCTL_ARND  -Wall -Wextra  -std=gnu++17 -o CMakeFiles/cmTC_570ed.dir/src.cxx.o -c /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx:3:18: fatal error: sys/sysctl.h: No such file or directory
+    3 |         #include <sys/sysctl.h>
+      |                  ^~~~~~~~~~~~~~
+compilation terminated.
+gmake[1]: *** [CMakeFiles/cmTC_570ed.dir/build.make:78: CMakeFiles/cmTC_570ed.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_570ed/fast] Error 2
+
+
+Source file was:
+
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+	int main() {
+		static const int name[2] = {CTL_KERN, KERN_ARND};
+		sysctl(name, 2, nullptr, nullptr, nullptr, 0);
+		return 0;
+	}
+
+Performing C++ SOURCE FILE Test CHAR_EQUALS_INT8 failed with the following output:
+Change Dir: /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a2203/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a2203.dir/build.make CMakeFiles/cmTC_a2203.dir/build
+gmake[1]: Entering directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_a2203.dir/src.cxx.o
+/usr/bin/c++ -DCHAR_EQUALS_INT8  -Wall -Wextra  -std=gnu++17 -o CMakeFiles/cmTC_a2203.dir/src.cxx.o -c /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx: In function ‘int main()’:
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx:5:51: error: static assertion failed
+    5 |         static_assert(std::is_same<int8_t, char>::value, "");
+      |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~
+gmake[1]: *** [CMakeFiles/cmTC_a2203.dir/build.make:78: CMakeFiles/cmTC_a2203.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_a2203/fast] Error 2
+
+
+Source file was:
+
+    #include <cstdint>
+    #include <type_traits>
+    int main() {
+        static_assert(std::is_same<int8_t, char>::value, "");
+        return 0;
+    }
+
+Performing C++ SOURCE FILE Test HAVE_FUNC_ATTRIBUTE_DLLEXPORT failed with the following output:
+Change Dir: /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_62d5a/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_62d5a.dir/build.make CMakeFiles/cmTC_62d5a.dir/build
+gmake[1]: Entering directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_62d5a.dir/src.cxx.o
+/usr/bin/c++ -DHAVE_FUNC_ATTRIBUTE_DLLEXPORT  -Wall -Wextra  -std=gnu++17 -o CMakeFiles/cmTC_62d5a.dir/src.cxx.o -c /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/src.cxx:2:15: error: expected constructor, destructor, or type conversion before ‘(’ token
+    2 |     __declspec(dllexport) int main() {
+      |               ^
+gmake[1]: *** [CMakeFiles/cmTC_62d5a.dir/build.make:78: CMakeFiles/cmTC_62d5a.dir/src.cxx.o] Error 1
+gmake[1]: Leaving directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_62d5a/fast] Error 2
+
+
+Source file was:
+
+    __declspec(dllexport) int main() {
+        return 0;
+    }
+
+Determining if the prototype __fdelt_warn exists for FDELT_PROTOTYPE_LONG_UNSIGNED_INT failed with the following output:
+Change Dir: /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_d112f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_d112f.dir/build.make CMakeFiles/cmTC_d112f.dir/build
+gmake[1]: Entering directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_d112f.dir/CheckPrototypeDefinition.c.o
+/usr/bin/cc -D_FORTIFY_SOURCE=2  -Wall -Wextra -O2 -std=gnu11 -o CMakeFiles/cmTC_d112f.dir/CheckPrototypeDefinition.c.o -c /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/CheckPrototypeDefinition.c
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/CheckPrototypeDefinition.c:14:26: error: conflicting types for ‘__fdelt_warn’; have ‘long unsigned int(long unsigned int)’
+   14 | extern long unsigned int __fdelt_warn(long unsigned int a) {
+      |                          ^~~~~~~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/sys/select.h:150,
+                 from /home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/CheckPrototypeDefinition.c:1:
+/usr/include/x86_64-linux-gnu/bits/select2.h:25:17: note: previous declaration of ‘__fdelt_warn’ with type ‘long int(long int)’
+   25 | extern long int __fdelt_warn (long int __d)
+      |                 ^~~~~~~~~~~~
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/CheckPrototypeDefinition.c: In function ‘__fdelt_warn’:
+/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp/CheckPrototypeDefinition.c:14:57: warning: unused parameter ‘a’ [-Wunused-parameter]
+   14 | extern long unsigned int __fdelt_warn(long unsigned int a) {
+      |                                       ~~~~~~~~~~~~~~~~~~^
+gmake[1]: *** [CMakeFiles/cmTC_d112f.dir/build.make:78: CMakeFiles/cmTC_d112f.dir/CheckPrototypeDefinition.c.o] Error 1
+gmake[1]: Leaving directory '/home/ken/Work/eminer/fastmine/CMakeFiles/CMakeTmp'
+gmake: *** [Makefile:127: cmTC_d112f/fast] Error 2
+
+
+
+#include <sys/select.h>
+
+
+static void cmakeRequireSymbol(int dummy, ...) {
+  (void) dummy;
+}
+
+static void checkSymbol(void) {
+#ifndef __fdelt_warn
+  cmakeRequireSymbol(0, &__fdelt_warn);
+#endif
+}
+
+extern long unsigned int __fdelt_warn(long unsigned int a) {
+  return 0;
+}
+
+#ifdef __CLASSIC_C__
+int main() {
+  int ac;
+  char*av[];
+#else
+int main(int ac, char *av[]) {
+#endif
+  checkSymbol();
+  if (ac > 1000) {
+    return *av[0];
+  }
+  return 0;
+}
+
+

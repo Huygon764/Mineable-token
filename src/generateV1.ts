@@ -3,9 +3,9 @@ dotenv.config();
 import BigNumber from "bignumber.js";
 import { BITBOX as BITBOXSDK, ECPair } from "bitbox-sdk";
 import * as crypto from "crypto";
-import { BlockNotification, ClientReadableStream,
-         GetMempoolResponse, GrpcClient,
-         TransactionNotification } from "grpc-bchrpc-node";
+// import { BlockNotification, ClientReadableStream,
+//          GetMempoolResponse, GrpcClient,
+//          TransactionNotification } from "grpc-bchrpc-node";
 import { BchdNetwork,
          LocalValidator, ScriptSigP2PK, ScriptSigP2PKH,
          ScriptSigP2SH, Slp, SlpAddressUtxoResult,
@@ -13,8 +13,32 @@ import { BchdNetwork,
          TransactionHelpers, Utils,
          Validation } from "slpjs";
 import { Crypto, ValidatorType1 } from "slp-validate";
-import { GraphSearchClient } from "grpc-graphsearch-node";
+// import { GraphSearchClient } from "grpc-graphsearch-node";
 import { ValidityCache } from "./cache";
+const PROTO_PATH = __dirname + '/pb/bchrpc.proto';
+var grpc = require('@grpc/grpc-js');
+var protoLoader = require('@grpc/proto-loader');
+var packageDefinition = protoLoader.loadSync(
+    PROTO_PATH,
+    {keepCase: true,
+     longs: String,
+     enums: String,
+     defaults: true,
+     oneofs: true
+    }
+);
+var pb = grpc.loadPackageDefinition(packageDefinition).pb;
+import {
+    Ecc,
+    P2PKHSignatory,
+    Script,
+    TxBuilder,
+    fromHex,
+    shaRmd160,
+    toHex,
+    ALL_BIP143,
+} from 'ecash-lib';
+const Bitcore = require("bitcoincashjs-lib-p2sh");
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -40,17 +64,20 @@ const slp = new Slp(BITBOX);
 const txnHelpers = new TransactionHelpers(slp);
 
 import bchaddr from "bchaddrjs-slp";
-const Bitcore = require("bitcoincashjs-lib-p2sh");
+// import { BlockNotification, GetMempoolResponse, TransactionNotification, } from "../@types/bchrpc_pb";
+import { ClientReadableStream } from "@grpc/grpc-js";
+import { ServiceClient } from "@grpc/grpc-js/build/src/make-client";
+import { IbchrpcClient } from "./pb/bchrpc_grpc_pb";
+import { GrpcClient } from "./client";
+import { BlockNotification, GetMempoolResponse, TransactionNotification } from "./pb/bchrpc_pb";
+// import { bchrpcClient } from "../@types/bchrpc_grpc_pb";
 
-let client: GrpcClient;
-if (process.env.BCHD_GRPC_CERT) {
-    client = new GrpcClient({ url: process.env.BCHD_GRPC_URL, rootCertPath: process.env.BCHD_GRPC_CERT });
-} else {
-    client = new GrpcClient({ url: process.env.BCHD_GRPC_URL });
-}
+const client: GrpcClient = new GrpcClient({url: process.env.ECASH_GRPC_URL })
 
-const minerWif: string = process.env.WIF!;
+//Wallet: Mining token
+const minerWif: string = 'KwhgKkLwAGkw6dPGdpMnnRX2dfCnsyXijZV7HdnREcX1M6KD4xBH';
 const minerPubKey = (new ECPair().fromWIF(minerWif)).getPublicKeyBuffer();
+const minerXecAddress = 'ecash:qreqsg7323cwyf9xa859qpcmzd0xe3mmfqvygvt97z';
 const minerBchAddress = Utils.toCashAddress((new ECPair().fromWIF(minerWif)).getAddress());
 const minerSlpAddress = Utils.toSlpAddress(minerBchAddress);
 const vaultHexTail = process.env.MINER_COVENANT_V1!;
@@ -89,19 +116,19 @@ const network = new BchdNetwork({ BITBOX, client, validator });
 const txid: string = process.env.TOKEN_ID_V1!;
 
 /// Use slp-validate (BCHD gRPC) - uncomment lines 92-104
-(async function() {
-    console.time("SLP-VALIDATE-GRPC");
-    const slpValidator = new ValidatorType1({ getRawTransaction: async (txid: string) => {
-        const res = await client.getRawTransaction({ hash: txid, reversedHashOrder: true });
-        return Buffer.from(res.getTransaction_asU8());
-    } });
-    console.log("Validating:", txid);
-    console.log("This may take a several seconds...");
-    const isValid = await slpValidator.isValidSlpTxid({ txid });
-    console.log("Final Result:", isValid);
-    /// console.log("WARNING: THIS VALIDATION METHOD COMES WITH NO BURN PROTECTION.");
-    console.timeEnd("SLP-VALIDATE-GRPC");
-})();
+// (async function() {
+//     console.time("SLP-VALIDATE-GRPC");
+//     const slpValidator = new ValidatorType1({ getRawTransaction: async (txid: string) => {
+//         const res = await client.getRawTransaction({ hash: txid, reversedHashOrder: true });
+//         return Buffer.from(res.getTransaction_asU8());
+//     } });
+//     console.log("Validating:", txid);
+//     console.log("This may take a several seconds...");
+//     const isValid = await slpValidator.isValidSlpTxid({ txid });
+//     console.log("Final Result:", isValid);
+//     /// console.log("WARNING: THIS VALIDATION METHOD COMES WITH NO BURN PROTECTION.");
+//     console.timeEnd("SLP-VALIDATE-GRPC");
+// })();
 
 // Use Graph Search slp-validate (GS++) - uncomment lines 107-141
     //const excludeList: string[] = [
@@ -270,19 +297,17 @@ const processTxnList = async (txnDataList: GetMempoolResponse.TransactionData[])
     }
 };
 
-export const generateV1 = async () => {
-
+export const generateV1 = async () => {    
     // clear list of txn ids persisted txn bufs
     ValidityCache.utxoIds.clear();
 
     state = JSON.parse(JSON.stringify(defaultState));
-    //state.bestBlockchainHeight = (await client.getBlockchainInfo()).getBestHeight();
+    state.bestBlockchainHeight = (await client.getBlockchainInfo()).getBestHeight();
 
     // scan blocks for MINT baton
-    if (! state.lastBatonTxid) {
+    if (!state.lastBatonTxid) {
         let blockHeight = (await client.getBlockchainInfo()).getBestHeight();
-        while (! state.lastBatonTxid) {
-            // TODO: ...
+        while (!state.lastBatonTxid) {
             state.bestBlockchainHeight = (await client.getBlockchainInfo()).getBestHeight();
             const block = await client.getBlock({ index: blockHeight, fullTransactions: true });
             await processTxnList(block.getBlock()!.getTransactionDataList());
@@ -321,11 +346,11 @@ export const generateV1 = async () => {
     console.log(`Reward txo: ${state.lastBatonTxid}:2`);
 
     // get miner's address unspent UTXOs
-    console.log(`Getting unspent txos for ${minerBchAddress}`);
-    const unspent = await client.getAddressUtxos({ address: minerBchAddress, includeMempool: true });
+    console.log(`Getting unspent txos for ${minerXecAddress}`);
+    const unspent = await client.getAddressUtxos({ address: minerXecAddress, includeMempool: true });
     const txos = unspent.getOutputsList().map((o) => {
         return {
-            cashAddress: minerBchAddress,
+            cashAddress: minerXecAddress,
             satoshis: o.getValue(),
             txid: Buffer.from(o.getOutpoint()!.getHash_asU8().slice().reverse()).toString("hex"),
             vout: o.getOutpoint()!.getIndex(),
@@ -336,7 +361,7 @@ export const generateV1 = async () => {
                     null,
         } as SlpAddressUtxoResult;
     });
-    console.log(`Completed fetching txos for ${minerBchAddress}`);
+    console.log(`Completed fetching txos for ${minerXecAddress}`);
 
     // add current utxo txids to cache so that we store the txns in our persisted cache to speed up local validation
     // ValidityCache.utxoIds.clear();
@@ -347,9 +372,9 @@ export const generateV1 = async () => {
     console.log(`Validating unspent SLP txos in miner's wallet...`);
     const utxos = await network.processUtxosForSlp(txos);
     console.log(`Finished validating SLP txos in miner's wallet.`);
-    let txnInputs = utxos.nonSlpUtxos.filter((o: any) => o.satoshis >= 1870);
+    let txnInputs = utxos.nonSlpUtxos.filter((o: any) => o.satoshis >= 546);
     if (txnInputs.length === 0) {
-        throw Error("There are no non-SLP inputs available to pay for gas");
+        throw Error("There are no non-SLP inputs available to pay for fee");
     }
 
     // verify actual t0 address matches our computed address
@@ -412,7 +437,6 @@ export const generateV1 = async () => {
         }
     }
     await ValidityCache.write();
-
     // select the inputs for transaction
     txnInputs = [ ...baton.slpBatonUtxos[process.env.TOKEN_ID_V1 as string], txnInputs[0] ];
 
@@ -422,21 +446,21 @@ export const generateV1 = async () => {
 
     // create a MINT Transaction
     let unsignedMintHex = txnHelpers.simpleTokenMint({
-                                        tokenId: process.env.TOKEN_ID_V1!,
-                                        mintAmount: new BigNumber(rewardAmount),
-                                        inputUtxos: txnInputs,
-                                        tokenReceiverAddress: minerSlpAddress,
-                                        batonReceiverAddress: vaultAddressT1,
-                                        changeReceiverAddress: minerSlpAddress,
-                                        extraFee,
-                                        disableBchChangeOutput: true,
-                                        });
+        tokenId: process.env.TOKEN_ID_V1!,
+        mintAmount: new BigNumber(rewardAmount),
+        inputUtxos: txnInputs,
+        tokenReceiverAddress: minerSlpAddress,
+        batonReceiverAddress: vaultAddressT1,
+        changeReceiverAddress: minerSlpAddress,
+        extraFee,
+        disableBchChangeOutput: true,
+    });
 
     // set nSequence to enable CLTV for all inputs, and set transaction Locktime
     unsignedMintHex = txnHelpers.enableInputsCLTV(unsignedMintHex);
 
     console.log(`Blockchain height: ${state.bestBlockchainHeight}`);
-    console.log(`Maze height: ${state.bestTokenHeight}`);
+    console.log(`MToken2 height: ${state.bestTokenHeight}`);
 
     if (state.bestTokenHeight >= (state.bestBlockchainHeight - tokenStartBlock)) {
         console.log("Token height is synchronized with blockchain height, after solution is mined will wait for block before submitting solution.");
@@ -449,13 +473,13 @@ export const generateV1 = async () => {
     const batonTxo = baton.slpBatonUtxos[process.env.TOKEN_ID_V1!][0];
     const batonTxoInputIndex = 0;
     const sigObj = txnHelpers.get_transaction_sig_p2sh(
-                                unsignedMintHex,
-                                minerWif,
-                                batonTxoInputIndex,
-                                batonTxo.satoshis,
-                                redeemScriptBufT0,
-                                redeemScriptBufT0,
-                                );
+        unsignedMintHex,
+        minerWif,
+        batonTxoInputIndex,
+        batonTxo.satoshis,
+        redeemScriptBufT0,
+        redeemScriptBufT0,
+    );
 
     const tx = Bitcore.Transaction.fromHex(unsignedMintHex);
     console.log(`Preimage:`);
@@ -476,7 +500,7 @@ export const generateV1 = async () => {
                 console.log("Miner exited early since token reward has been found.");
                 return false;
             }
-            console.log("Please wait, mining for Maze (using fastmine)...");
+            console.log("Please wait, mining for MToken2 (using fastmine)...");
             const cmd = `${process.cwd()}/fastmine/fastmine ${scriptPreImage.toString("hex")} ${difficulty}`;
             const content =  await execute(cmd) as string;
             const lines = content.split("\n");
@@ -555,11 +579,11 @@ export const generateV1 = async () => {
     // Build p2pkh scriptSigs
     txnInputs[1].wif = process.env.WIF as string;
     const scriptSigsP2pkh = txnHelpers.get_transaction_sig_p2pkh(
-                                            unsignedMintHex,
-                                            minerWif,
-                                            1,
-                                            txnInputs[1].satoshis,
-                                            ) as ScriptSigP2PKH;
+        unsignedMintHex,
+        minerWif,
+        1,
+        txnInputs[1].satoshis,
+    ) as ScriptSigP2PKH;
 
     const scriptSigs = [ scriptSigsP2sh, scriptSigsP2pkh ] as Array<ScriptSigP2PK|ScriptSigP2PKH|ScriptSigP2SH>;
     const signedTxn = txnHelpers.addScriptSigs(unsignedMintHex, scriptSigs);
@@ -588,17 +612,19 @@ export const generateV1 = async () => {
     // submit our solution to bchd
     try {
         const txres = await client.submitTransaction({txnHex: signedTxn});
-        console.log(`Submitted solution in txid: ${state.lastBatonTxid} (via BCHD)`);
+        const txid = Buffer.from(txres.getHash_asU8().reverse()).toString("hex");
+        console.log("🚀 ~ txid:", txid);
+        console.log(`Submitted solution in txid: ${state.lastBatonTxid} (via XEC)`);
         return;
     } catch (error) {
-        if (! (error as Error).message.includes("already spent by transaction") &&
-            ! (error as Error).message.includes("tx rejected: orphan transaction")) {
+        if (!(error as Error).message.includes("already spent by transaction") &&
+            !(error as Error).message.includes("tx rejected: orphan transaction")) {
             throw error;
         } else if ((error as Error).message.includes("has insufficient priority")) {
             throw Error("Transaction fee too low");
         } else {
             //console.log(`BCHD submit failed: ${ error.message }`);
-            console.log(`BCHD submit failed`);
+            console.log(error);
         }
     }
 

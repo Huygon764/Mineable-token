@@ -10,7 +10,6 @@ dotenv.config();
 
 import { BITBOX } from "bitbox-sdk";
 import { Utils } from "slpjs";
-import {encodeCashAddress} from 'ecashaddrjs'
 
 const bitbox = new BITBOX();
 
@@ -27,21 +26,12 @@ const startingBlockHeight = encodeAsHex(parseInt(process.env.TOKEN_START_BLOCK_V
 
 const vaultHexT0 = `04${contractStateT0}20${process.env.TOKEN_ID_V1}${initialMintAmount}${difficultyLeadingZeroBytes}${halvingInterval}${startingBlockHeight}${vaultHexTail}`;
 
-console.log("🚀 ~ vaultHexT0:", vaultHexT0);
-
 const redeemScriptBufT0 = Buffer.from(vaultHexT0, "hex");
 const vaultHash160 = bitbox.Crypto.hash160(redeemScriptBufT0);
-// const vaultAddressT0 = Utils.slpAddressFromHash160(vaultHash160, "mainnet", "p2sh");
-const vaultAddressT0 = encodeCashAddress('ecash', 'p2sh', vaultHash160);
-
-// console.log("****************");
-// console.log("****************");
-// console.log(`Send baton here to create mining vault -> ${vaultAddressT0}`);
-// console.log("****************");
-// console.log("****************");
+const vaultAddressT0 = Utils.slpAddressFromHash160(vaultHash160, "mainnet", "p2sh");
 
 console.log("****************");
 console.log("****************");
-console.log(`Send baton here to create ecash mining vault -> ${vaultAddressT0}`);
+console.log(`Send baton here to create mining vault -> ${vaultAddressT0}`);
 console.log("****************");
 console.log("****************");

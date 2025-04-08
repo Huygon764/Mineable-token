@@ -1,0 +1,11 @@
+/home/ken/Work/eminer/fastmine/CMakeFiles/fastmine.dir
+/home/ken/Work/eminer/fastmine/CMakeFiles/edit_cache.dir
+/home/ken/Work/eminer/fastmine/CMakeFiles/rebuild_cache.dir
+/home/ken/Work/eminer/fastmine/config/CMakeFiles/edit_cache.dir
+/home/ken/Work/eminer/fastmine/config/CMakeFiles/rebuild_cache.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/crypto.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/crypto_sse4.1.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/crypto_avx2.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/crypto_shani.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/edit_cache.dir
+/home/ken/Work/eminer/fastmine/crypto/CMakeFiles/rebuild_cache.dir
