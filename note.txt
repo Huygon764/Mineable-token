@@ -1,0 +1,65 @@
+NOTE
+
+fastmine: miner, c++, not touch
+spedn: smart contract
+- slp-miner-reward-v0.spedn = Produces a constant mining reward, constant hashing rate (difficulty = 2)
+- slp-miner-reward-v1.spedn = Produces a variable mining reward with 8 halving events, constant hashing rate (difficulty = 2), and has a CLTV set to 1 block so that SLP mining matches blocks
+- slp-miner-reward-v2.spedn = Same as v1 plus a Difficulty Adjustment Algorithm driven by baton value amount, higher BCH value on the baton results in higher mining difficulty
+- slp-miner-reward-v3.spedn = (Not completed) Same as v2 plus an additional dev fund p2sh output
+
+Note v1: 
+// preimage deserializaion: split to get data
+// check sig to enforce valid preimage and scriptCode: check sig
+// verify new state is updated to the proper block height: check the next p2sh tokenHeight is correct
+
+// calculate proper mintAmount based on current block height: check height for division
+
+// flip the byte order for SLP output amount
+
+// verify the miner's solution is acceptable using the prev difficulty: check miner diff is correct
+
+// prepend the new state to rawscr: prepare data
+
+Prepare 3 output
+https://explorer.e.cash/tx/e30c5588dce8c874436329c2b2a960578bda25f562a2cf0d6c871e6a37cfe752
+
+
+-------------------------------
+
+
+folder pb: 
+protocol buffer: type - interface
+
+client:
+chronik client but for grpc
+
+convert.ts
+Purpose: This script convert mnemonic phrase into private key, public key and wif
+
+generatev1:
+unlock v0 and generate v1 to mine
+
+init:
+generate v0 for the first block
+
+mine-first-block:
+mine the first block
+
+-----------------------
+0. Go to cashtab and create token. Then go to .env TOKEN_INIT_REWARD_V1, TOKEN_START_BLOCK_V1, TOKEN_ID_V1
+
+1. go init.ts and edit and get p2sh address
+
+Optional: go to convert file to get private key and public key of wallet that own the token
+
+2. run send-baton.ts
+edit walletSk, decodeCashAddress
+
+3. run mine-first-block
+
+4. generate-v1
+
+-----
+goal: every 144 blocks, diff / 0.99981
+
+block: check diff is equal, figure out how fastmine work to adjust diff based on algo
