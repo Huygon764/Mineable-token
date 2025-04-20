@@ -60,6 +60,6 @@ edit walletSk, decodeCashAddress
 4. generate-v1
 
 -----
-goal: every 144 blocks, diff / 0.99981
+goal: every 144 blocks, diff / 0.9981
 
 block: check diff is equal, figure out how fastmine work to adjust diff based on algo

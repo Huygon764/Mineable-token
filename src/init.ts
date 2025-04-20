@@ -27,6 +27,11 @@ const startingBlockHeight = encodeAsHex(parseInt(process.env.TOKEN_START_BLOCK_V
 
 const vaultHexT0 = `04${contractStateT0}20${process.env.TOKEN_ID_V1}${initialMintAmount}${difficultyLeadingZeroBytes}${halvingInterval}${startingBlockHeight}${vaultHexTail}`;
 
+console.log("🚀 ~ startingBlockHeight:", startingBlockHeight)
+console.log("🚀 ~ halvingInterval:", halvingInterval)
+console.log("🚀 ~ difficultyLeadingZeroBytes:", difficultyLeadingZeroBytes)
+console.log("🚀 ~ initialMintAmount:", initialMintAmount)
+console.log("🚀 ~ process.env.TOKEN_ID_V1:", process.env.TOKEN_ID_V1)
 console.log("🚀 ~ vaultHexT0:", vaultHexT0);
 
 const redeemScriptBufT0 = Buffer.from(vaultHexT0, "hex");

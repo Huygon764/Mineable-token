@@ -14,14 +14,14 @@ const BITBOX = new BITBOXSDK();
 const slp = new Slp(BITBOX);
 const txnHelpers = new TransactionHelpers(slp);
 
-let lastBatonTxid = '2379ae9b3354e82bdccba09e2af4abaeb9e8883a55b4ee79f3e4168bf0c6d7f6';
-let mintVaultAddressT0 = '';
+let lastBatonTxid = 'debfb9410b5f71cff166910abc023135bf0d328dfd7c43eecd91701442f728da';
+let mintVaultAddressT0 = 'ecash:qqdetxa62xzal32rum25g5rhcy6xnsj3mu6mpkxygc';
 const client: GrpcClient = new GrpcClient({url: process.env.ECASH_GRPC_URL })
 
 //Wallet: Mining token
-const minerWif: string = 'KwhgKkLwAGkw6dPGdpMnnRX2dfCnsyXijZV7HdnREcX1M6KD4xBH';
+const minerWif: string = 'L1AZYtVm8iiQZMNycLHRbvhEB76escosp695zHzVYkaWPzsadu9C';
 const minerPubKey = (new ECPair().fromWIF(minerWif)).getPublicKeyBuffer();
-const minerXecAddress = 'ecash:qreqsg7323cwyf9xa859qpcmzd0xe3mmfqvygvt97z';
+const minerXecAddress = 'ecash:qz58em7hgt5ys7zymgetyfkudt60tdph7utvp7unqz';
 const minerBchAddress = Utils.toCashAddress((new ECPair().fromWIF(minerWif)).getAddress());
 const minerSlpAddress = Utils.toSlpAddress(minerBchAddress);
 
@@ -323,6 +323,8 @@ const mineFirstBlock = async () => {
    const scriptSigs = [ scriptSigsP2sh, scriptSigsP2pkh ] as Array<ScriptSigP2PK|ScriptSigP2PKH|ScriptSigP2SH>;
    console.log("🚀 ~ mineFirstBlock ~ scriptSigs:", scriptSigs)
    const signedTxn = txnHelpers.addScriptSigs(unsignedMintHex, scriptSigs);
+   console.log("🚀 ~ mineFirstBlock ~ signedTxn:", signedTxn)
+   console.log("hash 160 redeeem script: ", vaultHash160.toString('hex'))
    console.log(`scriptPubKeyHex T0: ${scriptPubKeyHexT0}`);
    console.log(`redeem Script Buf T0: ${redeemScriptBufT0.toString("hex")}`);
    console.log(`scriptPubKeyHex T1: ${scriptPubKeyHexT1}`);

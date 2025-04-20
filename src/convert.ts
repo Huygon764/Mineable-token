@@ -14,7 +14,9 @@ const XPI = new BCHJS({});
 
 
 const convert = async () => {
-   const rootSeedBuffer = await XPI.Mnemonic.toSeed('lift plug rebuild bid glove sea skin harbor cluster then furnace wool');
+    const mnemonic = "merit limit warfare enact gadget drive slight basket vicious slender melt sign"
+//    const rootSeedBuffer = await XPI.Mnemonic.toSeed('lift plug rebuild bid glove sea skin harbor cluster then furnace wool');
+   const rootSeedBuffer = await XPI.Mnemonic.toSeed(mnemonic);
    const masterHDNode = XPI.HDNode.fromSeed(rootSeedBuffer);
    const hdPath = `m/44'/1899'/0'/0/0`;
    const node = await XPI.HDNode.derivePath(masterHDNode, hdPath);

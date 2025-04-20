@@ -75,9 +75,9 @@ import { BlockNotification, GetMempoolResponse, TransactionNotification } from "
 const client: GrpcClient = new GrpcClient({url: process.env.ECASH_GRPC_URL })
 
 //Wallet: Mining token
-const minerWif: string = 'KwhgKkLwAGkw6dPGdpMnnRX2dfCnsyXijZV7HdnREcX1M6KD4xBH';
+const minerWif: string = 'L1AZYtVm8iiQZMNycLHRbvhEB76escosp695zHzVYkaWPzsadu9C';
 const minerPubKey = (new ECPair().fromWIF(minerWif)).getPublicKeyBuffer();
-const minerXecAddress = 'ecash:qreqsg7323cwyf9xa859qpcmzd0xe3mmfqvygvt97z';
+const minerXecAddress = 'ecash:qz58em7hgt5ys7zymgetyfkudt60tdph7utvp7unqz';
 const minerBchAddress = Utils.toCashAddress((new ECPair().fromWIF(minerWif)).getAddress());
 const minerSlpAddress = Utils.toSlpAddress(minerBchAddress);
 const vaultHexTail = process.env.MINER_COVENANT_V1!;
@@ -298,6 +298,7 @@ const processTxnList = async (txnDataList: GetMempoolResponse.TransactionData[])
 };
 
 export const generateV1 = async () => {    
+    console.log('running generateV1')
     // clear list of txn ids persisted txn bufs
     ValidityCache.utxoIds.clear();
 
@@ -311,6 +312,7 @@ export const generateV1 = async () => {
             state.bestBlockchainHeight = (await client.getBlockchainInfo()).getBestHeight();
             const block = await client.getBlock({ index: blockHeight, fullTransactions: true });
             await processTxnList(block.getBlock()!.getTransactionDataList());
+            console.log("🚀 ~ blockHeight:", blockHeight)
             blockHeight--;
         }
     }
@@ -567,7 +569,7 @@ export const generateV1 = async () => {
         lockingScriptBuf: redeemScriptBufT0,
         unlockingScriptBufArray: [
             stateT1Buf,
-            prehash.slice(scriptPreImage.length),
+            prehash.slice(scriptPreImage.length), // solution
             mintAmountLE,
             sigObj.signatureBuf,
             minerPubKey,

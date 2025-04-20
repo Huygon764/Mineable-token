@@ -8,7 +8,7 @@
 import * as dotenv from "dotenv";
 import { ALL_BIP143, Ecc, fromHex, P2PKHSignatory, Script, shaRmd160, slpSend, toHex, TxBuilder , SLP_FUNGIBLE, slpMintVault, TxBuilderInput, slpMint, pushBytesOp, UnsignedTxInput, sha256d, signWithSigHash, SigHashType} from "ecash-lib";
 import { decodeCashAddress } from "ecashaddrjs";
-import {ChronikClient} from 'chronik-client'
+import {ChronikClient, ScriptUtxo} from 'chronik-client'
 const BCHJS = require('@bcpros/xpi-js')
 import wif from 'wif';
 dotenv.config();
@@ -18,27 +18,41 @@ const ecc = new Ecc();
 const send = async () => {
     const chronik = new ChronikClient(['https://chronik-native1.fabien.cash'])
     // Build a signature context for elliptic curve cryptography (ECC)
-    const walletSk = fromHex(
-        '53f3ca14c7191287f340976d8db71abdff7a26b0c0c86f2fffa4bd7adf51164e',
-    );
+    const sk = "870e89fb8ddff47ab703f0b9e8dec3b0695630955cbb02693444b64cd562a848" // add your pr key
+    const walletSk = fromHex(sk);
     const walletPk = ecc.derivePubkey(walletSk);
     const walletPkh = shaRmd160(walletPk);
     const walletP2pkh = Script.p2pkh(walletPkh);
 
-    const {hash, type} = decodeCashAddress('ecash:pptxcdlr85sg78hdsqfgyry5yuzfaqtspg0h58t7gl');
+    const {hash, type} = decodeCashAddress('ecash:ppqcejyqhgjyd375w2n6shdg24798jvlnyqhut84em'); // address from init file
     const {utxos} = await chronik.script('p2pkh', Buffer.from(walletPkh).toString('hex')).utxos();
 
+    // console.log("🚀 ~ send ~ utxos:", utxos)
+    // return;
+
     // Tx builder
+    let mintUtxo: ScriptUtxo;
+    let amountUtxo: ScriptUtxo;
+    utxos.map(utxo => {
+        if (utxo?.token?.tokenId === process.env.TOKEN_ID_V1 && utxo?.token?.isMintBaton) {
+            mintUtxo = utxo;
+        }
+        // amount > 50 to send
+        if (Number(utxo.sats) > 5000) {
+            amountUtxo = utxo;
+        }
+    })
+
     const txBuild = new TxBuilder({
         inputs: [
             {
                 input: {
                     prevOut: {
-                        outIdx: utxos[2].outpoint.outIdx,
-                        txid: utxos[2].outpoint.txid,
+                        outIdx: mintUtxo.outpoint.outIdx,
+                        txid: mintUtxo.outpoint.txid,
                     },
                     signData: {
-                        value: utxos[2].sats,
+                        value: mintUtxo.sats,
                         outputScript: walletP2pkh
                     },  
                 },
@@ -47,11 +61,11 @@ const send = async () => {
             {
                 input: {
                     prevOut: {
-                        outIdx: utxos[3].outpoint.outIdx,
-                        txid: utxos[3].outpoint.txid,
+                        outIdx: amountUtxo.outpoint.outIdx,
+                        txid: amountUtxo.outpoint.txid,
                     },
                     signData: {
-                        value: utxos[3].sats,
+                        value: amountUtxo.sats,
                         outputScript: walletP2pkh
                     },
  
@@ -67,25 +81,26 @@ const send = async () => {
             {
                 value: 546n,
                 script: Script.p2sh(Buffer.from(hash, 'hex'))
-            },  
+            }, // dont understand why need output?  
             {
                  value: 546n,
                 script: Script.p2sh(Buffer.from(hash, 'hex'))
             },
-            {
-                value: 5000n,
-                script: walletP2pkh
-            }
+            walletP2pkh
         ],
     });
-    const tx = txBuild.sign({ecc, feePerKb: 100, dustLimit: 546});
+    const tx = txBuild.sign({ecc, feePerKb: 1000, dustLimit: 546});
     const rawTx = tx.ser();
+    console.log("🚀 ~ send ~ amountUtxo:", amountUtxo)
+    console.log("🚀 ~ send ~ mintUtxo:", mintUtxo)
     console.log(toHex(rawTx));
 
     const txid = (await chronik.broadcastTx(rawTx)).txid;
     console.log("Sent successfully!");
     console.log("🚀 ~ send ~ txid:", txid);
 }
+
+
 
 
 send();
